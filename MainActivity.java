@@ -1,19 +1,26 @@
 import android.content.Context;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,10 +29,15 @@ public class MainActivity extends AppCompatActivity {
     boolean accelerometerPresent;
     Sensor accelerometerSensor;
     TextView textX, textY, textZ;
+    Button button;
+    String label = "";
 
+    Writer writer;
     FileOutputStream fileOutputStream;
     File file;
     int tmp = 0;
+    boolean writeHead = false;
+    boolean writeBtn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             accelerometerPresent = false;
         }
+
+        button = (Button) findViewById(R.id.write);
     }
 
     @Override
@@ -68,55 +82,101 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private SensorEventListener accelerometerListener = new SensorEventListener(){
-      @Override
-      public void onAccuracyChanged(Sensor arg0, int arg1){
+        @Override
+        public void onAccuracyChanged(Sensor arg0, int arg1){
 
-      }
-      @Override
-      public void onSensorChanged(SensorEvent event){
-          textX.setText("X: " + String.valueOf(event.values[0]));
-          textY.setText("Y: " + String.valueOf(event.values[1]));
-          textZ.setText("Z: " + String.valueOf(event.values[2]));
+        }
+        @Override
+        public void onSensorChanged(SensorEvent event){
+            textX.setText("X: " + String.valueOf(event.values[0]));
+            textY.setText("Y: " + String.valueOf(event.values[1]));
+            textZ.setText("Z: " + String.valueOf(event.values[2]));
 
-          // write into file
-          // file name: output.txt
-          try {
-              File sdcard =  Environment.getExternalStorageDirectory();
-              TextView sdpath = (TextView) findViewById(R.id.path);
-              sdpath.setText(sdcard.toString()+ File.separator + "test");
-              //Log.d("SAVEPATH",sdcard.toString()+ File.separator + "test");
-              File folder = new File(sdcard + File.separator + "test");
-              folder.mkdirs();
-              file = new File(folder, "output.txt");
+            // write into file
+            // file name: output.txt
+            // down the directory: /storage/emulated/0/test/
+            try {
+                File sdcard =  Environment.getExternalStorageDirectory();
+                TextView sdpath = (TextView) findViewById(R.id.path);
+                sdpath.setText(sdcard.toString()+ File.separator + "test");
+                //Log.d("SAVEPATH",sdcard.toString()+ File.separator + "test");
+                File folder = new File(sdcard + File.separator + "test");
+                folder.mkdirs();
+                file = new File(folder, "output.txt");
 
-              fileOutputStream = new FileOutputStream(file, true);
-              if (!file.exists()) {
-                  file.createNewFile();
-                  Log.d("FILE", "create new file");
-              }
-              if (tmp == 30) {
-                  Long tsLong = System.currentTimeMillis()/1000;
-                  String ts = tsLong.toString();
-                  fileOutputStream.write((ts + ",").getBytes());
-                  fileOutputStream.write((String.valueOf(event.values[0]) + ",").getBytes());
-                  fileOutputStream.write((String.valueOf(event.values[1]) + ",").getBytes());
-                  fileOutputStream.write((String.valueOf(event.values[2]) + "\n").getBytes());
-                  fileOutputStream.flush();
-                  tmp = 0;
-              }
-              tmp ++;
-
-              fileOutputStream.close();
-          } catch (IOException e){
-              e.printStackTrace();
-          } finally {
-              try {
-                  if (fileOutputStream != null)
-                      fileOutputStream.close();
-              } catch (IOException e){
-                  e.printStackTrace();
-              }
-          }
-      }
+                if (writeBtn) {
+                    fileOutputStream = new FileOutputStream(file, true);
+                    if (!file.exists()) {
+                        file.createNewFile();
+                        Log.d("FILE", "create new file");
+                    }
+                    if (!writeHead) {
+                        fileOutputStream.write("time,x,y,z\n".getBytes());
+                        writeHead = true;
+                    }
+                    //if (writeBtn) {
+                    if (tmp == 10) {
+                        Long tsLong = System.currentTimeMillis() / 1000;
+                        String ts = tsLong.toString();
+                        fileOutputStream.write((ts + ",").getBytes());
+                        fileOutputStream.write((String.valueOf(event.values[0]) + ",").getBytes());
+                        fileOutputStream.write((String.valueOf(event.values[1]) + ",").getBytes());
+                        fileOutputStream.write((String.valueOf(event.values[2]) + "\n").getBytes());
+                        fileOutputStream.flush();
+                        tmp = 0;
+                    }
+                    tmp++;
+                    //}
+                    fileOutputStream.close();
+                }
+            } catch (IOException e){
+                e.printStackTrace();
+            /*} finally {
+                try {
+                    if (fileOutputStream != null)
+                        fileOutputStream.close();
+                } catch (IOException e){
+                    e.printStackTrace();
+                }*/
+            }
+        }
     };
+
+    public void onClick(View view){
+        if (!writeBtn)
+            writeBtn = true;
+        else {
+            labelDialog();
+            writeBtn = false;
+        }
+    }
+
+    private void labelDialog(){
+        final View item = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_layout, null);
+        final EditText editText = (EditText) item.findViewById(R.id.label);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.label_title);
+        builder.setView(item);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which){
+                    label = editText.getText().toString();
+
+                    try {
+                        File sdcard =  Environment.getExternalStorageDirectory();
+                        File folder = new File(sdcard + File.separator + "test");
+                        folder.mkdirs();
+                        file = new File(folder, "output.txt");
+
+                        fileOutputStream = new FileOutputStream(file, true);
+                        fileOutputStream.write(label.getBytes());
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+        builder.show();
+    }
 }
