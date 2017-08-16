@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     String label = "";
 
-    Writer writer;
     FileOutputStream fileOutputStream;
     File file;
     int tmp = 0;
@@ -110,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
                         file.createNewFile();
                         Log.d("FILE", "create new file");
                     }
+                    // write header in file, for drawing line chart
                     if (!writeHead) {
                         fileOutputStream.write("time,x,y,z\n".getBytes());
                         writeHead = true;
                     }
-                    //if (writeBtn) {
                     if (tmp == 10) {
                         Long tsLong = System.currentTimeMillis() / 1000;
                         String ts = tsLong.toString();
@@ -126,26 +125,22 @@ public class MainActivity extends AppCompatActivity {
                         tmp = 0;
                     }
                     tmp++;
-                    //}
                     fileOutputStream.close();
                 }
             } catch (IOException e){
                 e.printStackTrace();
-            /*} finally {
-                try {
-                    if (fileOutputStream != null)
-                        fileOutputStream.close();
-                } catch (IOException e){
-                    e.printStackTrace();
-                }*/
             }
         }
     };
 
     public void onClick(View view){
-        if (!writeBtn)
+        if (!writeBtn) {
+            // press button one time to start recording
             writeBtn = true;
-        else {
+            Toast.makeText(this, "Start recording", Toast.LENGTH_SHORT).show();
+        } else {
+            // press button another time to stop recording
+            // and ask user to give a label
             labelDialog();
             writeBtn = false;
         }
@@ -169,9 +164,11 @@ public class MainActivity extends AppCompatActivity {
                         file = new File(folder, "output.txt");
 
                         fileOutputStream = new FileOutputStream(file, true);
-                        fileOutputStream.write(label.getBytes());
+                        fileOutputStream.write((label + "\n").getBytes());
                         fileOutputStream.flush();
                         fileOutputStream.close();
+
+                        writeHead = false;
                     } catch (IOException e){
                         e.printStackTrace();
                     }
