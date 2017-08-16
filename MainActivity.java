@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         fileOutputStream.write("time,x,y,z\n".getBytes());
                         writeHead = true;
                     }
-                    if (tmp == 10) {
+                    if (tmp == 15) { // do not write every time when changed, prefer once a second
                         Long tsLong = System.currentTimeMillis() / 1000;
                         String ts = tsLong.toString();
                         fileOutputStream.write((ts + ",").getBytes());
