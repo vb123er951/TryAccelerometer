@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         fileOutputStream.write("time,x,y,z\n".getBytes());
                         writeHead = true;
                     }
-                    if (tmp == 10) { // do not write every time when changed
+                    //if (tmp == 10) { // do not write every time when changed
                         Long tsLong = System.currentTimeMillis();
                         String ts = tsLong.toString();
                         fileOutputStream.write((ts + ",").getBytes());
@@ -122,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
                         fileOutputStream.write((String.valueOf(event.values[1]) + ",").getBytes());
                         fileOutputStream.write((String.valueOf(event.values[2]) + "\n").getBytes());
                         fileOutputStream.flush();
-                        tmp = 0;
-                    }
-                    tmp++;
+                        //tmp = 0;
+                    //}
+                    //tmp++;
                     fileOutputStream.close();
                 }
             } catch (IOException e){
@@ -133,17 +133,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void onClick(View view){
-        if (!writeBtn) {
-            // press button one time to start recording
-            writeBtn = true;
-            Toast.makeText(this, "Start recording", Toast.LENGTH_SHORT).show();
-        } else {
-            // press button another time to stop recording
-            // and ask user to give a label
-            labelDialog();
-            writeBtn = false;
-        }
+    // click WRITE button to start recording
+    public void clickWrite(View view){
+        writeBtn = true;
+        Toast.makeText(this, "Start recording", Toast.LENGTH_SHORT).show();
+    }
+
+    // click STOP button to stop recording
+    // and ask user to give a label
+    public void clickStop(View view){
+        writeBtn = false;
+        labelDialog();
     }
 
     private void labelDialog(){
