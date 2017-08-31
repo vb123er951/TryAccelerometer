@@ -1,8 +1,10 @@
 # TryAccelerometer
 
 Trying to work with cell phone accelerometer
+
 To record the accelerometer values, and using it to recognize human activities
-Reference paper: A Deep Learning Approach to Human Activity Recognition Based on Single Accelerometer
+
+Referenced paper: A Deep Learning Approach to Human Activity Recognition Based on Single Accelerometer
 
 ### Activity version ###
 Run the whole app in an activity (both accelerometer and user control)
