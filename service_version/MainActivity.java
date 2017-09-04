@@ -31,7 +31,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
     private MyService s;
 
-    TextView textX, textY, textZ;
+    TextView textX, textY, textZ, textStatus;
     String label = "";
 
     FileOutputStream fileOutputStream;
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         textX = (TextView) findViewById(R.id.textx);
         textY = (TextView) findViewById(R.id.texty);
         textZ = (TextView) findViewById(R.id.textz);
+        textStatus = (TextView) findViewById(R.id.status);
     }
 
     @Override
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         textX.setText("X: " + s.getX());
         textY.setText("Y: " + s.getY());
         textZ.setText("Z: " + s.getZ());
+        textStatus.setText(R.string.stop_record);
     }
 
     @Override
@@ -98,12 +100,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         //writeBtn = true;
         s.setWriteBtn(true);
         Toast.makeText(this, "Start recording", Toast.LENGTH_SHORT).show();
+        textStatus.setText(R.string.start_record);
     }
 
     // click STOP button to stop recording
     // and ask user to give a label
     public void clickStop(View view){
         s.setWriteBtn(false);
+        textStatus.setText(R.string.stop_record);
         labelDialog();
     }
 
