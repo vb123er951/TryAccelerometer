@@ -108,33 +108,38 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     private void labelDialog(){
+        final String[] list = {"walk", "stand", "sit"};
+        ArrayAdapter<String> listAdapter;
         final View item = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_layout, null);
-        final EditText editText = (EditText) item.findViewById(R.id.label);
+        final ListView listView = (ListView) item.findViewById(R.id.label);
+        listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
+        listView.setAdapter(listAdapter);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.label_title);
         builder.setView(item);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog, int which){
-                    label = editText.getText().toString();
+        final AlertDialog alert = builder.show();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                label = list[position];
+                try {
+                    File sdcard =  Environment.getExternalStorageDirectory();
+                    File folder = new File(sdcard + File.separator + "test");
+                    //folder.mkdirs();
+                    file = new File(folder, "output.txt");
 
-                    try {
-                        File sdcard =  Environment.getExternalStorageDirectory();
-                        File folder = new File(sdcard + File.separator + "test");
-                        //folder.mkdirs();
-                        file = new File(folder, "output.txt");
+                    fileOutputStream = new FileOutputStream(file, true);
+                    fileOutputStream.write((label + "\n").getBytes());
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
 
-                        fileOutputStream = new FileOutputStream(file, true);
-                        fileOutputStream.write((label + "\n").getBytes());
-                        fileOutputStream.flush();
-                        fileOutputStream.close();
-
-                        s.setWriteHead(false);
-                    } catch (IOException e){
-                        e.printStackTrace();
-                    }
+                    s.setWriteHead(false);
+                } catch (IOException e){
+                    e.printStackTrace();
                 }
-            });
-        builder.show();
+                alert.dismiss();
+            }
+        });
     }
 }
