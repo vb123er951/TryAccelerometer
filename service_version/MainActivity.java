@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void clickStop(View view){
         s.setWriteBtn(false);
         textStatus.setText(R.string.stop_record);
-        timeFlag = false;
         labelDialog();
+        timeFlag = false;
     }
 
     private void labelDialog(){
