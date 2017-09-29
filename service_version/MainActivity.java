@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     private void labelDialog(){
-        final String[] list = {"walk", "stand", "sit"};
+        final String[] list = {"walk", "stand", "sit", "upstairs", "downstairs", "run"};
         ArrayAdapter<String> listAdapter;
         final View item = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_layout, null);
         final ListView listView = (ListView) item.findViewById(R.id.label);
@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     fileOutputStream.close();
 
                     s.setWriteHead(false);
+                    Toast.makeText(MainActivity.this, label, Toast.LENGTH_SHORT).show();
                 } catch (IOException e){
                     e.printStackTrace();
                 }
