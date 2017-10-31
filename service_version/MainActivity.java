@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         textY.setText("Y: " + s.getY());
         textZ.setText("Z: " + s.getZ());
         textStatus.setText(R.string.stop_record);
-        textTime.setText("start recording for  0  seconds.");
+        textTime.setText("start recording for  0  minutes  0  seconds.");
     }
 
     @Override
@@ -123,13 +123,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     // count the time of recording period
     private Runnable updateTimer = new Runnable(){
         public void run(){
-            Long seconds = 0L;
+            Long minutes = 0L, seconds = 0L;
             if (timeFlag) {
                 Long currentTime = System.currentTimeMillis();
                 Long spentTime = currentTime - startTime;
                 seconds = (spentTime / 1000) % 60;
+                minutes = (spentTime / 1000) / 60;
             }
-            textTime.setText("start recording for  " + seconds + "  seconds.");
+            textTime.setText("start recording for  " + minutes + "  minutes  " + seconds + "  seconds.");
             handler.postDelayed(this, 1000);
         }
     };
